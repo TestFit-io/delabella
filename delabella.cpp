@@ -24,6 +24,7 @@ Copyright (C) 2018-2022 GUMIX - Marcin Sokalski
 #include <algorithm>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 
 #include "delabella.h"
 #include "predicates.h"

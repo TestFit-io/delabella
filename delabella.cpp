@@ -1597,6 +1597,11 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		if (advance_bytes == 0)
 			advance_bytes = 2 * sizeof(I);
 
+		errlog_proc(errlog_file, "ConstrainEdges()");
+		errlog_proc(errlog_file, "%ld edges, %lu advance", edges, advance_bytes);
+		for (I i = 0; i < edges; ++i)
+			errlog_proc(errlog_file, "edge[%ld] = [%ld, %ld]", i, pa[i], pb[i]);
+
 		int unfixed = 0;
 
 		uint64_t time0 = uSec();
@@ -1604,6 +1609,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		int pro = 0;
 		for (I con = 0; con < edges; con++)
 		{
+			errlog_proc(errlog_file, "con[%ld]", con);
 			if (con >= pro)
 			{
 				uint64_t p = (int)((uint64_t)100 * con / edges);
@@ -1619,18 +1625,24 @@ struct CDelaBella2 : IDelaBella2<T, I>
 			I a = *(const I *)((const char *)pa + (intptr_t)con * advance_bytes);
 			I b = *(const I *)((const char *)pb + (intptr_t)con * advance_bytes);
 
-			if (!first_dela_face || a == b)
+			if (!first_dela_face || a == b) {
+				errlog_proc(errlog_file, "%s:%d", __FILE__, __LINE__);
 				continue;
+			}
 
 			// current
 			Vert *va = (Vert *)GetVertexByIndex(a);
-			if (!va)
+			if (!va) {
+				errlog_proc(errlog_file, "%s:%d", __FILE__, __LINE__);
 				continue;
+			}
 
 			// destination
 			Vert *vc = (Vert *)GetVertexByIndex(b);
-			if (!vc)
+			if (!vc) {
+				errlog_proc(errlog_file, "%s:%d", __FILE__, __LINE__);
 				continue;
+			}
 
 			do
 			{
@@ -1641,8 +1653,10 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 				if (!list)
 				{
+					errlog_proc(errlog_file, "%s:%d", __FILE__, __LINE__);
 					if (restart)
 					{
+						errlog_proc(errlog_file, "%s:%d", __FILE__, __LINE__);
 						// if (classify)
 						{
 							Face *nf[2];
@@ -1986,9 +2000,9 @@ struct CDelaBella2 : IDelaBella2<T, I>
 						Vert *vr = (Vert *)(F->v[d]);
 
 						// fixed by calling F->cross()
-						// bool np = N->dotP(*vr);
-						// bool fp = F->dotP(*v);
-						// assert(np && fp || !np && !fp);
+						bool np = N->dotP(*vr);
+						bool fp = F->dotP(*v);
+						assert(np && fp || !np && !fp);
 
 						// can we check if it was flipped last time?
 						// if ((N->index & 0x40000000) == 0)
@@ -3564,7 +3578,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		}
 
 #ifdef DELABELLA_AUTOTEST
-		assert(((char *)idx - (char *)indices) / advance_bytes == ret);
+		assert(((char *)idx - (char *)indices) / (I)advance_bytes == ret);
 #endif
 
 		return ret;
@@ -3670,7 +3684,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		}
 
 #ifdef DELABELLA_AUTOTEST
-		assert(((char *)idx - (char *)indices) / advance_bytes == ret);
+		assert(((char *)idx - (char *)indices) / (I)advance_bytes == ret);
 #endif
 
 		return verts;

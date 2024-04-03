@@ -986,6 +986,21 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		Face *cache = 0;
 
 		I points = Prepare(&i, &hull, &hull_faces, &cache, sort_stamp, stop);
+
+		if (errlog_proc)
+		{
+			for (I i = 0; i < inp_verts; i++)
+			{
+				Vert* v = vert_alloc + i;
+				errlog_proc(errlog_file, "[%d] Prepared vertex [%f, %f, i=%d, next=%lu]\n", i, v->x, v->y, v->i, static_cast<Vert*>(v->next) - vert_alloc);
+			}
+			for (I i = 0; i < inp_verts; i++)
+			{
+				I* ii = vert_map + i;
+				errlog_proc(errlog_file, "[%d] Prepared vert_map =%d\n", i, *ii);
+			}
+		}
+
 		unique_points = points < 0 ? -points : points;
 		if (points <= 0)
 		{
@@ -3269,6 +3284,14 @@ struct CDelaBella2 : IDelaBella2<T, I>
 			if (errlog_proc)
 				errlog_proc(errlog_file, "\n[ERR] Not enough memory, shop for some more RAM. See you!\n");
 			return 0;
+		}
+		else if (errlog_proc)
+		{
+			for (I i = 0; i < points; i++)
+			{
+				Vert* v = vert_alloc + i;
+				errlog_proc(errlog_file, "[%d] Split vertex [%f, %f, i=%d, next=%lu]\n", i, v->x, v->y, v->i, static_cast<Vert*>(v->next) - vert_alloc);
+			}
 		}
 
 		#if 0

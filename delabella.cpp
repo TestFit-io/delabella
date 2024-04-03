@@ -992,7 +992,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 			for (I i = 0; i < inp_verts; i++)
 			{
 				Vert* v = vert_alloc + i;
-				errlog_proc(errlog_file, "[%d] Prepared vertex [%f, %f, i=%d, next=%lu]\n", i, v->x, v->y, v->i, static_cast<Vert*>(v->next) - vert_alloc);
+				errlog_proc(errlog_file, "[%d] Prepared vertex [%f, %f, i=%d]\n", i, v->x, v->y, v->i);
 			}
 			for (I i = 0; i < inp_verts; i++)
 			{
@@ -3290,7 +3290,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 			for (I i = 0; i < points; i++)
 			{
 				Vert* v = vert_alloc + i;
-				errlog_proc(errlog_file, "[%d] Split vertex [%f, %f, i=%d, next=%lu]\n", i, v->x, v->y, v->i, static_cast<Vert*>(v->next) - vert_alloc);
+				errlog_proc(errlog_file, "[%d] Split vertex [%f, %f, i=%d]\n", i, v->x, v->y, v->i);
 			}
 		}
 

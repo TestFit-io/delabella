@@ -286,22 +286,26 @@ namespace detail {
 	};
 
 	//std::fma is faster than dekker's product when the processor instruction is available
+	//NOTE(rgriege): Due to potential bugs in the non-fma implementation (see comment at
+	//the attempted re-define of FP_FAST_FMAF), run fma even when it's slow.  Clang will
+	//generate the fast version even though these macros aren't defined depending on the
+	//compiler flags. I was able to do it on Godbolt using -mfma.
 	#ifdef FP_FAST_FMAF
 		static const bool fp_fast_fmaf = true;
 	#else
-		static const bool fp_fast_fmaf = false;
+		static const bool fp_fast_fmaf = true;
 	#endif
 
 	#ifdef FP_FAST_FMA
 		static const bool fp_fast_fma = true;
 	#else
-		static const bool fp_fast_fma = false;
+		static const bool fp_fast_fma = true;
 	#endif
 
 	#ifdef FP_FAST_FMAL
 		static const bool fp_fast_fmal = true;
 	#else
-		static const bool fp_fast_fmal = false;
+		static const bool fp_fast_fmal = true;
 	#endif
 
 	#ifdef _PREDICATES_CXX11_IS_SUPPORTED

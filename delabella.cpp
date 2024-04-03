@@ -19,6 +19,7 @@ Copyright (C) 2018-2022 GUMIX - Marcin Sokalski
 
 #include <random>
 #include <cassert>
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <algorithm>
@@ -336,6 +337,55 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 	int (*errlog_proc)(void *file, const char *fmt, ...);
 	void *errlog_file;
+
+	ptrdiff_t V2I(typename IDelaBella2<T, I>::Vertex* vert)
+	{
+		return vert ? static_cast<Vert*>(vert) - vert_alloc : -1;
+	}
+
+	ptrdiff_t F2I(typename IDelaBella2<T, I>::Simplex* face)
+	{
+		return face ? static_cast<Face*>(face) - face_alloc : -1;
+	}
+
+	void Debug(const char *loc)
+	{
+		errlog_proc(errlog_file, "---DEBUG@%s---", loc);
+		errlog_proc(errlog_file, "inp_verts: %d", inp_verts);
+		errlog_proc(errlog_file, "out_verts: %d", out_verts);
+		errlog_proc(errlog_file, "polygons: %d", polygons);
+		errlog_proc(errlog_file, "out_hull_faces: %d", out_hull_faces);
+		errlog_proc(errlog_file, "out_boundary_verts: %d", out_boundary_verts);
+		errlog_proc(errlog_file, "unique_points: %d", unique_points);
+		errlog_proc(errlog_file, "max_verts: %d", max_verts);
+		errlog_proc(errlog_file, "max_faces: %d", max_faces);
+
+		for (I i = 0; i < inp_verts; i++)
+		{
+			Vert* v = vert_alloc + i;
+			errlog_proc(errlog_file, "vert_alloc[%i] = [x=%f,y=%f,i=%d,next=%ld,sew=%ld]", i, v->x, v->y, v->i, V2I(v->next), F2I(v->sew));
+		}
+
+		for (I i = 0; i < inp_verts; i++)
+		{
+			I* ii = vert_map + i;
+			errlog_proc(errlog_file, "vert_map[%d] = %d", i, *ii);
+		}
+
+		for (I i = 0; i < max_faces; i++)
+		{
+			Face* f = face_alloc + i;
+			errlog_proc(errlog_file, "face_alloc[%d] = {v=[%ld,%ld,%ld],f=[%ld,%ld,%ld],next=%ld,index=%d,flags=%x", i,
+					V2I(f->v[0]), V2I(f->v[1]), V2I(f->v[2]),
+					F2I(f->f[0]), F2I(f->f[1]), F2I(f->f[2]),
+					F2I(f->next), f->index, f->flags);
+		}
+
+		errlog_proc(errlog_file, "first_dela_face = %ld", F2I(first_dela_face));
+		errlog_proc(errlog_file, "first_hull_face = %ld", F2I(first_hull_face));
+		errlog_proc(errlog_file, "first_boundary_vert = %ld", V2I(first_boundary_vert));
+		errlog_proc(errlog_file, "first_internal_vert = %ld", V2I(first_internal_vert));
+	}
 
 	I Prepare(I *start, Face **hull, I *out_hull_faces, Face **cache, uint64_t *sort_stamp, I stop)
 	{
@@ -987,19 +1037,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 		I points = Prepare(&i, &hull, &hull_faces, &cache, sort_stamp, stop);
 
-		if (errlog_proc)
-		{
-			for (I i = 0; i < inp_verts; i++)
-			{
-				Vert* v = vert_alloc + i;
-				errlog_proc(errlog_file, "[%d] Prepared vertex [%f, %f, i=%d]\n", i, v->x, v->y, v->i);
-			}
-			for (I i = 0; i < inp_verts; i++)
-			{
-				I* ii = vert_map + i;
-				errlog_proc(errlog_file, "[%d] Prepared vert_map =%d\n", i, *ii);
-			}
-		}
+		Debug("Post-Prepare()");
 
 		unique_points = points < 0 ? -points : points;
 		if (points <= 0)
@@ -1193,6 +1231,8 @@ struct CDelaBella2 : IDelaBella2<T, I>
 				nx->sew->f[1] = pr->sew;
 				pr = nx;
 			} while (pr != entry);
+
+			Debug("Triangulation");
 		}
 
 		// printf("seeds: %d, grows: %d\n", seeds, grows);
@@ -1239,6 +1279,8 @@ struct CDelaBella2 : IDelaBella2<T, I>
 				others++;
 			}
 		}
+
+		Debug("Faces?");
 
 		if (other_faces)
 			*other_faces = others;
@@ -1288,6 +1330,8 @@ struct CDelaBella2 : IDelaBella2<T, I>
 #endif
 		}
 
+		Debug("Boundary?");
+
 		// link all other verts into internal list
 		first_internal_vert = 0;
 		Vert **prev_inter = &first_internal_vert;
@@ -1300,6 +1344,8 @@ struct CDelaBella2 : IDelaBella2<T, I>
 				prev_inter = (Vert **)&next->next;
 			}
 		}
+
+		Debug("Link");
 
 		if (errlog_proc)
 			errlog_proc(errlog_file, "\r[100] convex hull triangulation (%lld ms)\n", (uSec() - *sort_stamp) / 1000);
@@ -1612,7 +1658,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		if (advance_bytes == 0)
 			advance_bytes = 2 * sizeof(I);
 
-		errlog_proc(errlog_file, "ConstrainEdges()");
+		Debug("ConstrainEdges()");
 		errlog_proc(errlog_file, "%ld edges, %lu advance", edges, advance_bytes);
 		for (I i = 0; i < edges; ++i)
 			errlog_proc(errlog_file, "edge[%ld] = [%ld, %ld]", i, pa[i], pb[i]);
@@ -2163,6 +2209,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 				va = restart;
 			} while (va);
+			Debug("ConstrainEdges::loop");
 		}
 
 		// clean up the mess we've made with dela faces list !!!

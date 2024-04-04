@@ -404,6 +404,7 @@ namespace detail {
 			static T MultTail(const T a, const T b, const T p) {return std::fma(a, b, -p);}
 			static T MultTailPreSplit(const T a, const T b, const std::pair<T, T> /*bSplit*/, const T p) {return std::fma(a, b, -p);}
 #else
+#error "These operations produce different results and can cause infinite loops."
 			static T MultTail(const T a, const T b, const T p) {return DekkersProduct(a, Split(a), b, Split(b), p);}
 			static T MultTailPreSplit(const T a, const T b, const std::pair<T, T> bSplit, const T p) {return DekkersProduct(a, Split(a), b, bSplit, p);}
 #endif

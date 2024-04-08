@@ -289,6 +289,8 @@ namespace detail {
 // Standard defines: https://en.cppreference.com/w/cpp/numeric/math/fma
 #if defined(__FMA__) || defined(__FMA4__) || defined(__AVX2__) || (defined(FP_FAST_FMA) && defined(FP_FAST_FMAF))
 #define _PREDICATES_FAST_FMA 1
+#else
+#pragma message("Using slower FMA operations")
 #endif
 
 	//@brief  : helper function to sort by absolute value
@@ -400,7 +402,7 @@ namespace detail {
 			}
 
 			//roundoff error of x = a * b
-#if defined(_PREDICATES_CXX11_IS_SUPPORTED) && defined(_PREDICATES_FAST_FMA)
+#if defined(_PREDICATES_CXX11_IS_SUPPORTED)
 			static T MultTail(const T a, const T b, const T p) {return std::fma(a, b, -p);}
 			static T MultTailPreSplit(const T a, const T b, const std::pair<T, T> /*bSplit*/, const T p) {return std::fma(a, b, -p);}
 #else

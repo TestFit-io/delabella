@@ -3845,19 +3845,50 @@ template <typename T, typename I>
 const T CDelaBella2<T, I>::Vert::resulterrbound = (T(3) + T(8) * std::exp2(-(T)std::numeric_limits<T>::digits)) * std::exp2(-(T)std::numeric_limits<T>::digits);
 
 // this should cover all malcontents
+#ifdef DELABELLA_INT8
+#ifdef DELABELLA_FLOAT
 template IDelaBella2<float, int8_t> *IDelaBella2<float, int8_t>::Create();
+#endif
+#ifdef DELABELLA_DOUBLE
 template IDelaBella2<double, int8_t> *IDelaBella2<double, int8_t>::Create();
+#endif
+#ifdef DELABELLA_LONG_DOUBLE
 template IDelaBella2<long double, int8_t> *IDelaBella2<long double, int8_t>::Create();
+#endif
+#endif
 
+#ifdef DELABELLA_INT16
+#ifdef DELABELLA_FLOAT
 template IDelaBella2<float, int16_t> *IDelaBella2<float, int16_t>::Create();
+#endif
+#ifdef DELABELLA_DOUBLE
 template IDelaBella2<double, int16_t> *IDelaBella2<double, int16_t>::Create();
+#endif
+#ifdef DELABELLA_LONG_DOUBLE
 template IDelaBella2<long double, int16_t> *IDelaBella2<long double, int16_t>::Create();
+#endif
+#endif
 
+#ifdef DELABELLA_INT32
+#ifdef DELABELLA_FLOAT
 template IDelaBella2<float, int32_t> *IDelaBella2<float, int32_t>::Create();
+#endif
+#ifdef DELABELLA_DOUBLE
 template IDelaBella2<double, int32_t> *IDelaBella2<double, int32_t>::Create();
+#endif
+#ifdef DELABELLA_LONG_DOUBLE
 template IDelaBella2<long double, int32_t> *IDelaBella2<long double, int32_t>::Create();
+#endif
+#endif
 
+#ifdef DELABELLA_INT64
+#ifdef DELABELLA_FLOAT
 template IDelaBella2<float, int64_t> *IDelaBella2<float, int64_t>::Create();
+#endif
+#ifdef DELABELLA_DOUBLE
 template IDelaBella2<double, int64_t> *IDelaBella2<double, int64_t>::Create();
+#endif
+#ifdef DELABELLA_LONG_DOUBLE
 template IDelaBella2<long double, int64_t> *IDelaBella2<long double, int64_t>::Create();
-
+#endif
+#endif
